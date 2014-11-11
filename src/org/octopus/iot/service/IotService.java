@@ -21,8 +21,6 @@ public class IotService {
 	@Inject
 	Dao dao;
 	
-	@Inject UserService userService;
-	
 	public IotUser rootUser() {
 		IotUser admin = dao.fetch(IotUser.class, Cnd.where("name", "=", "admin"));
 		if (admin != null)

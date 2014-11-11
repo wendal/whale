@@ -171,7 +171,7 @@ public class IotSensorService {
 			trigger.trigger(sensor, map, v);
 		}
 		// publish to mqtt
-		mqttService.publish("iot/sensor/"+sensor.getId(), sensor.getValue());
+		mqttService.publish("iot2/sensor/"+sensor.getId(), sensor.getValue());
 		return null;
 	}
 	

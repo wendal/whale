@@ -33,7 +33,7 @@ public class MqttService {
 	
 	int qos = 2;
 	String broker ;
-	String clientId = "JavaSample" + System.currentTimeMillis();
+	String clientId = "IotMaster" + System.currentTimeMillis();
 	MemoryPersistence persistence = new MemoryPersistence();
 	MqttClient sampleClient;
 	ExecutorService es;

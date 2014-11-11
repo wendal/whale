@@ -15,18 +15,14 @@ import org.nutz.mvc.annotation.At;
 import org.nutz.mvc.annotation.Fail;
 import org.nutz.mvc.annotation.Ok;
 import org.nutz.mvc.annotation.Param;
-import org.octopus.iot.IotKeys;
 import org.octopus.iot.bean.IotSensor;
 import org.octopus.iot.bean.IotUser;
-import org.octopus.iot.service.UserService;
 
 @IocBean
 @At("/iot2/mqtt/auth")
 public class MqttAuthModule {
 
 	@Inject Dao dao;
-	
-	@Inject UserService userService; // 主体User,不是IotUser哦
 	
 	static View HTTP_403 = new View() {
 		
@@ -66,7 +62,7 @@ public class MqttAuthModule {
 		if (Strings.isBlank(topic) || !topic.matches("^iot2/sensor/[0-9]+$"))
 			return HTTP_403;
 		long sensor_id = Long.parseLong(topic.substring("iot2/sensor/".length()));
-		IotSensor sensor = dao.fetch(IotSensor.class, Cnd.where(IotKeys.UID, "=", userService.userId(username)).and("id", "=", sensor_id));
+		IotSensor sensor = dao.fetch(IotSensor.class, Cnd.where("name", "=", username).and("id", "=", sensor_id));
 		if (sensor == null)
 			return HTTP_403;
 		return null;

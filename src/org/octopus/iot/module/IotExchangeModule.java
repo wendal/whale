@@ -66,7 +66,7 @@ public class IotExchangeModule {
 			return;
 		}
 		if (sensor_id > 0) { // 图片上传
-			IotSensor sensor = dao.fetch(IotSensor.class, Cnd.where("id", "=", sensor_id).and("userId", "=", userId));
+			IotSensor sensor = dao.fetch(IotSensor.class, Cnd.where("id", "=", sensor_id).and(IotKeys.UID, "=", userId));
 			if (sensor == null) {
 				badReq(resp, Iots.NOTFOUND);
 				return;
