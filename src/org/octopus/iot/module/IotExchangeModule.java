@@ -13,6 +13,7 @@ import org.nutz.img.Images;
 import org.nutz.ioc.loader.annotation.Inject;
 import org.nutz.ioc.loader.annotation.IocBean;
 import org.nutz.lang.Files;
+import org.nutz.lang.Streams;
 import org.nutz.log.Log;
 import org.nutz.log.Logs;
 import org.nutz.mvc.adaptor.VoidAdaptor;
@@ -22,10 +23,14 @@ import org.nutz.mvc.annotation.Attr;
 import org.nutz.mvc.annotation.By;
 import org.nutz.mvc.annotation.Fail;
 import org.nutz.mvc.annotation.Filters;
+import org.nutz.mvc.annotation.GET;
+import org.nutz.mvc.annotation.Ok;
+import org.nutz.mvc.view.HttpStatusView;
 import org.octopus.iot.IotKeys;
 import org.octopus.iot.Iots;
 import org.octopus.iot.bean.IotSensor;
 import org.octopus.iot.mvc.ApiKeyFilter;
+import org.octopus.iot.mvc.IotHttpCmdHandler;
 import org.octopus.iot.service.IotSensorService;
 
 @IocBean
@@ -41,6 +46,9 @@ public class IotExchangeModule {
 	
 	@Inject
 	IotSensorService iotSensorService;
+	
+	@Inject
+	IotHttpCmdHandler iotHttpCmdHandler;
 	
 	@At({"/up", "/up/?"})
 	@AdaptBy(type=VoidAdaptor.class)
@@ -76,6 +84,7 @@ public class IotExchangeModule {
 			}
 		} else {
 			// 普通上传
+			iotHttpCmdHandler.exec(resp.getWriter(), Streams.readAndClose(req.getReader()), iotSensorService, dao);
 		}
 	}
 	
@@ -85,4 +94,16 @@ public class IotExchangeModule {
 		return;
 	}
 	
+	@At({"/get/?", "/get/?/?"})
+	@AdaptBy(type=VoidAdaptor.class)
+	@GET
+	@Ok("raw")
+	@Filters()
+	public Object get(long sensor_id, String key) {
+		IotSensor sensor = dao.fetch(IotSensor.class, sensor_id);
+		if (sensor == null) {
+			return HttpStatusView.HTTP_404;
+		}
+		return sensor.getValue() == null ? "" : sensor.getValue();
+	}
 }

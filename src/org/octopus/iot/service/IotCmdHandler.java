@@ -16,15 +16,16 @@ public abstract class IotCmdHandler {
 	private static final Log log = Logs.get();
 	
 	public void exec(Object ctx, String req, IotSensorService iotSensorService, Dao dao) {
-		for (String line : req.split("\n")) {
-			_exec(ctx, line, iotSensorService, dao);
+		for (String line : Strings.splitIgnoreBlank(req, "\n")) {
+			_exec(ctx, line.trim(), iotSensorService, dao);
 		}
+		end(ctx);
 	}
 
 	public void _exec(Object ctx, String req, IotSensorService iotSensorService, Dao dao) {
 		// Generate and write a response.
         if (req.isEmpty()) {
-            resp(ctx, "ok", "^-^");
+//            resp(ctx, "ok", "^-^");
             return;
         } 
         if ("bye".equals(req.toLowerCase())) {
@@ -121,4 +122,5 @@ public abstract class IotCmdHandler {
 	public abstract Long uid(Object ctx);
 	public abstract void uid(Object ctx, long uid);
 	public abstract void close(Object tx);
+	public void end(Object ctx){};
 }
