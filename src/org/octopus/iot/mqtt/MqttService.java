@@ -1,5 +1,8 @@
 package org.octopus.iot.mqtt;
 
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 import org.eclipse.paho.client.mqttv3.MqttClient;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
@@ -33,13 +36,15 @@ public class MqttService {
 	String clientId = "JavaSample" + System.currentTimeMillis();
 	MemoryPersistence persistence = new MemoryPersistence();
 	MqttClient sampleClient;
+	ExecutorService es;
 
 	public void init() throws Exception {
 		broker = String.format("tcp://%s:%d", mqttIp, mqttPort);
 		sampleClient = new MqttClient(broker, clientId, persistence);
+		es = Executors.newFixedThreadPool(16);
 	}
 	
-	public boolean _init() {
+	public synchronized boolean _init() {
 		if (sampleClient.isConnected())
 			return true;
 		IotUser root = iotService.rootUser();
@@ -59,19 +64,26 @@ public class MqttService {
 		}
 	}
 	
-	public void publish(String topic, String msg) {
-		if (!_init())
-			return;
+	public void publish(final String topic, final String msg) {
 		log.debugf("mqtt topic=%s msg=%s", topic, msg);
-		try {
-			sampleClient.publish(topic, msg.getBytes(), 2, true);
-		} catch (Exception e) {
-			log.infof("publish mqtt msg fail topic=%s msg=%s", topic, msg, e);
-		}
+		es.submit(new Runnable() {
+			public void run() {
+				try {
+					if (!_init())
+						return;
+					sampleClient.publish(topic, msg.getBytes(), 2, true);
+				} catch (Exception e) {
+					log.infof("publish mqtt msg fail topic=%s msg=%s", topic,
+							msg, e);
+				}
+			}
+		});
 	}
 
 	public void close() throws Exception {
+		es.shutdownNow();
 		if (sampleClient != null)
 			sampleClient.close();
+		
 	}
 }

@@ -19,4 +19,7 @@ public class Iots {
 	public static final String NEED_CONTENT_LENGTH = Json.toJson(new NutMap().setv("ok", false).setv("msg", "NEED Content-Length"), JsonFormat.compact());
 	public static final String EMTRY_BODY = Json.toJson(new NutMap().setv("ok", false).setv("msg", "emtry body"), JsonFormat.compact());
 	public static final String BAD_SENSOR_ID = Json.toJson(new NutMap().setv("ok", false).setv("msg", "bad sensor id"), JsonFormat.compact());
+	
+
+	
 }

@@ -1,7 +1,6 @@
 package org.octopus.iot;
 
 public interface IotKeys {
-
-	String UID = "userId";
-	String UKEY = "UKey";
+	public static final String UID = "userId";
+	public static final String UKEY = "UKey";
 }

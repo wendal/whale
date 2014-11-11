@@ -9,7 +9,6 @@ import io.netty.handler.codec.string.StringDecoder;
 import io.netty.handler.codec.string.StringEncoder;
 import io.netty.handler.ssl.SslContext;
 
-import org.nutz.ioc.Ioc;
 import org.nutz.ioc.loader.annotation.Inject;
 import org.nutz.ioc.loader.annotation.IocBean;
 
@@ -17,20 +16,21 @@ import org.nutz.ioc.loader.annotation.IocBean;
  * Creates a newly configured {@link ChannelPipeline} for a new channel.
  */
 @IocBean
-public class IotServerInitializer extends ChannelInitializer<AbstractChannel> {
+public class IotNettyTcpServerInitializer extends ChannelInitializer<AbstractChannel> {
 
     private static final StringDecoder DECODER = new StringDecoder();
     private static final StringEncoder ENCODER = new StringEncoder();
 
-    @Inject("refer:$ioc") Ioc ioc;
+    @Inject
+    IotNettyTcpHandler iotNettyTcpHandler;
 
     private final SslContext sslCtx;
     
-    public IotServerInitializer() {
+    public IotNettyTcpServerInitializer() {
 		sslCtx = null;
 	}
 
-    public IotServerInitializer(SslContext sslCtx) {
+    public IotNettyTcpServerInitializer(SslContext sslCtx) {
         this.sslCtx = sslCtx;
     }
 
@@ -48,6 +48,6 @@ public class IotServerInitializer extends ChannelInitializer<AbstractChannel> {
         pipeline.addLast(ENCODER);
 
         // and then business logic.
-        pipeline.addLast(ioc.get(IotServerHandler.class));
+        pipeline.addLast(iotNettyTcpHandler);
     }
 }

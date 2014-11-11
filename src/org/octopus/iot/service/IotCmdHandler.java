@@ -2,13 +2,18 @@ package org.octopus.iot.service;
 
 import java.util.Map;
 
+import org.nutz.dao.Cnd;
 import org.nutz.dao.Dao;
 import org.nutz.json.Json;
 import org.nutz.lang.Strings;
+import org.nutz.log.Log;
+import org.nutz.log.Logs;
 import org.octopus.iot.bean.IotSensor;
 import org.octopus.iot.bean.IotUser;
 
-public abstract class CmdHandler {
+public abstract class IotCmdHandler {
+	
+	private static final Log log = Logs.get();
 	
 	public void exec(Object ctx, String req, IotSensorService iotSensorService, Dao dao) {
 		for (String line : req.split("\n")) {
@@ -32,8 +37,9 @@ public abstract class CmdHandler {
             	return;
         }
         if ("auth".equals(tmp[0])) {
-        	IotUser usr = dao.fetch(IotUser.class, tmp[1]);
+        	IotUser usr = dao.fetch(IotUser.class, Cnd.where("apikey", "=", tmp[1]));
         	if (usr == null) {
+        		log.debug("auth fail");
             	resp(ctx, "err","bad api key");
             	return;
         	}

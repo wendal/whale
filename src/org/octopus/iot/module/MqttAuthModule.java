@@ -12,6 +12,7 @@ import org.nutz.log.Log;
 import org.nutz.log.Logs;
 import org.nutz.mvc.View;
 import org.nutz.mvc.annotation.At;
+import org.nutz.mvc.annotation.Fail;
 import org.nutz.mvc.annotation.Ok;
 import org.nutz.mvc.annotation.Param;
 import org.octopus.iot.IotKeys;
@@ -38,31 +39,33 @@ public class MqttAuthModule {
 	
 	@At("/user")
 	@Ok("void")
-	public View get_user(@Param("username")String username, @Param("password")String password) {
+	public View user(@Param("username")String username, @Param("password")String password) {
 		log.infof("u=%s p=%s", username, password);;
 		if (Strings.isBlank(username))
 			return HTTP_403;
-		if (dao.count(IotUser.class, Cnd.where(IotKeys.UID, "=", userService.userId(username)).and("apikey", "=", password)) == 1)
+		if (dao.count(IotUser.class, Cnd.where("name", "=", username).and("apikey", "=", password)) == 1) {
 			return null;
+		}
 		return HTTP_403;
 	}
 	
 	@At("/super")
 	@Ok("void")
 	public View isSuperUser(@Param("username")String username) {
-		if ("root".equals(username))
+		if ("admin".equals(username))
 			return null;
 		return HTTP_403;
 	}
 	
 	@At("/acl")
 	@Ok("void")
+	@Fail("http:403")
 	public View acl(@Param("username")String username, @Param("topic")String topic, @Param("acc")String acc) {
 		if (!"1".equals(acc))
 			return HTTP_403; // TODO 支持mqtt发布, 即通过mqtt更新传感器的值
-		if (Strings.isBlank(topic) || !topic.matches("^iot/sensor/[0-9]+$"))
+		if (Strings.isBlank(topic) || !topic.matches("^iot2/sensor/[0-9]+$"))
 			return HTTP_403;
-		long sensor_id = Long.parseLong(topic.substring("iot/sensor/".length()));
+		long sensor_id = Long.parseLong(topic.substring("iot2/sensor/".length()));
 		IotSensor sensor = dao.fetch(IotSensor.class, Cnd.where(IotKeys.UID, "=", userService.userId(username)).and("id", "=", sensor_id));
 		if (sensor == null)
 			return HTTP_403;

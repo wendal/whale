@@ -31,7 +31,9 @@ public class IotNettyService {
 	@Inject
 	IotSensorService iotSensorService;
 	@Inject
-	IotServerInitializer iotServerInitializer;
+	IotNettyTcpServerInitializer iotNettyTcpServerInitializer;
+	@Inject
+	IotNettyUdpHandler iotNettyUdpHandler;
 	
 	@Inject("java:$conf.get('netty.iot.tcp_port')")
 	int tcpPort;
@@ -62,7 +64,7 @@ public class IotNettyService {
 			tcpBoot.group(bossGroup, workerGroup)
 					.channel(NioServerSocketChannel.class)
 					.handler(new LoggingHandler(LogLevel.INFO))
-					.childHandler(iotServerInitializer);
+					.childHandler(iotNettyTcpServerInitializer);
 			tcpcf = tcpBoot.bind(tcpPort);
 		}
 		if (udpPort > 0) {
@@ -70,7 +72,7 @@ public class IotNettyService {
 			udpBoot.group(udpWorkGroup)
 				.channel(NioDatagramChannel.class)
 				.option(ChannelOption.SO_BROADCAST, true)
-				.handler(iotServerInitializer);
+				.handler(iotNettyUdpHandler);
 			udpcf = udpBoot.bind(udpPort);
 		}
 	}
