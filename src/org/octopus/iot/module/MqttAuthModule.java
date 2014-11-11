@@ -14,7 +14,7 @@ import org.nutz.mvc.View;
 import org.nutz.mvc.annotation.At;
 import org.nutz.mvc.annotation.Ok;
 import org.nutz.mvc.annotation.Param;
-import org.octopus.Zs;
+import org.octopus.iot.IotKeys;
 import org.octopus.iot.bean.IotSensor;
 import org.octopus.iot.bean.IotUser;
 import org.octopus.iot.service.UserService;
@@ -42,7 +42,7 @@ public class MqttAuthModule {
 		log.infof("u=%s p=%s", username, password);;
 		if (Strings.isBlank(username))
 			return HTTP_403;
-		if (dao.count(IotUser.class, Cnd.where(Zs.UID, "=", userService.userId(username)).and("apikey", "=", password)) == 1)
+		if (dao.count(IotUser.class, Cnd.where(IotKeys.UID, "=", userService.userId(username)).and("apikey", "=", password)) == 1)
 			return null;
 		return HTTP_403;
 	}
@@ -63,7 +63,7 @@ public class MqttAuthModule {
 		if (Strings.isBlank(topic) || !topic.matches("^iot/sensor/[0-9]+$"))
 			return HTTP_403;
 		long sensor_id = Long.parseLong(topic.substring("iot/sensor/".length()));
-		IotSensor sensor = dao.fetch(IotSensor.class, Cnd.where(Zs.UID, "=", userService.userId(username)).and("id", "=", sensor_id));
+		IotSensor sensor = dao.fetch(IotSensor.class, Cnd.where(IotKeys.UID, "=", userService.userId(username)).and("id", "=", sensor_id));
 		if (sensor == null)
 			return HTTP_403;
 		return null;

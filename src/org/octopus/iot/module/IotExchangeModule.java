@@ -22,7 +22,7 @@ import org.nutz.mvc.annotation.Attr;
 import org.nutz.mvc.annotation.By;
 import org.nutz.mvc.annotation.Fail;
 import org.nutz.mvc.annotation.Filters;
-import org.octopus.Zs;
+import org.octopus.iot.IotKeys;
 import org.octopus.iot.Iots;
 import org.octopus.iot.bean.IotSensor;
 import org.octopus.iot.mvc.ApiKeyFilter;
@@ -44,7 +44,7 @@ public class IotExchangeModule {
 	
 	@At({"/up", "/up/?"})
 	@AdaptBy(type=VoidAdaptor.class)
-	public void upload(long sensor_id, @Attr(Zs.UID)long userId, HttpServletResponse resp, HttpServletRequest req) throws IOException {
+	public void upload(long sensor_id, @Attr(IotKeys.UID)long userId, HttpServletResponse resp, HttpServletRequest req) throws IOException {
 		if (req.getHeader("Content-Length") == null) {
 			badReq(resp, Iots.NEED_CONTENT_LENGTH);
 			return;

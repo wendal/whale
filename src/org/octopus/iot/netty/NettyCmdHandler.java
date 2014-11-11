@@ -1,6 +1,6 @@
 package org.octopus.iot.netty;
 
-import org.octopus.Zs;
+import org.octopus.iot.IotKeys;
 import org.octopus.iot.service.CmdHandler;
 
 import io.netty.channel.ChannelFuture;
@@ -10,7 +10,7 @@ import io.netty.util.AttributeKey;
 
 public class NettyCmdHandler extends CmdHandler {
 	
-    static final AttributeKey<Long> UID = AttributeKey.valueOf(Zs.UID);
+    static final AttributeKey<Long> UID = AttributeKey.valueOf(IotKeys.UID);
 
 	public Object resp(Object ctx, String stat, String msg) {
 		return ((ChannelHandlerContext)ctx).write(stat + "," + msg + "\r\n");
